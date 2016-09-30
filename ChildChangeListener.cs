@@ -11,8 +11,6 @@ namespace ThomasJaworski.ComponentModel
     public class ChildChangeListener : ChangeListener
     {
         #region *** Members ***
-        protected static readonly Type InotifyType = typeof(INotifyPropertyChanged);
-
         private readonly INotifyPropertyChanged value;
         private readonly Type type;
         private readonly Dictionary<string, ChangeListener> childListeners = new Dictionary<string, ChangeListener>();
@@ -24,6 +22,8 @@ namespace ThomasJaworski.ComponentModel
         {
             if (instance == null)
                 throw new ArgumentNullException(nameof(instance));
+
+            Debug.WriteLine($"creating {nameof(ChildChangeListener)} for {instance}");
 
             value = instance;
             type = value.GetType();
@@ -43,22 +43,20 @@ namespace ThomasJaworski.ComponentModel
         private void Subscribe()
         {
             value.PropertyChanged += value_PropertyChanged;
-            var inotifyTypeInfo = InotifyType.GetTypeInfo();
 
-            var query =
-                from property
-                in type.GetTypeInfo().DeclaredProperties.Where(prop => (prop.GetMethod?.IsPublic ?? false) && (prop.GetMethod?.IsStatic ?? false))
-                where inotifyTypeInfo.IsAssignableFrom(property.PropertyType.GetTypeInfo())
-                select property;
-
-            foreach (var property in query)
+            foreach (var property in type.GetTypeInfo().DeclaredProperties)
             {
-                // Declare property as known "Child", then register it
-                childListeners.Add(property.Name, null);
+                if (!IsPubliclyReadable(property))
+                    continue;
+                if (!IsNotifier(property.GetValue(obj: this.value)))
+                    continue;
+
                 ResetChildListener(property.Name);
             }
         }
 
+        private static bool IsPubliclyReadable(PropertyInfo prop) => (prop.GetMethod?.IsPublic ?? false) && !prop.GetMethod.IsStatic;
+        static bool IsNotifier(object value) => (value is INotifyCollectionChanged) || (value is INotifyPropertyChanged);
 
         /// <summary>
         /// Resets known (must exist in children collection) child event handlers
@@ -66,42 +64,46 @@ namespace ThomasJaworski.ComponentModel
         /// <param name="propertyName">Name of known child property</param>
         private void ResetChildListener(string propertyName)
         {
-            if (childListeners.ContainsKey(propertyName))
+            ChangeListener listener;
+            // Unsubscribe if existing
+            if (childListeners.TryGetValue(propertyName, out listener)
+                && listener != null)
             {
-                // Unsubscribe if existing
-                if (childListeners[propertyName] != null)
-                {
-                    childListeners[propertyName].PropertyChanged -= child_PropertyChanged;
+                listener.PropertyChanged -= child_PropertyChanged;
 
-                    // Should unsubscribe all events
-                    childListeners[propertyName].Dispose();
-                    childListeners[propertyName] = null;
+                // Should unsubscribe all events
+                listener.Dispose();
+                listener = null;
+                childListeners.Remove(propertyName);
+            }
+
+            var property = type.GetTypeInfo().GetDeclaredProperty(propertyName);
+            if (property == null)
+                throw new InvalidOperationException(
+                    $"Was unable to get '{propertyName}' property information from Type '{type.Name}'");
+
+            object newValue = property.GetValue(value, null);
+
+            // Only recreate if there is a new value
+            if (newValue != null)
+            {
+                if (newValue is INotifyCollectionChanged)
+                {
+                    listener = childListeners[propertyName] =
+                        new CollectionChangeListener(newValue as INotifyCollectionChanged, propertyName);
+                }
+                else if (newValue is INotifyPropertyChanged)
+                {
+                    listener = childListeners[propertyName] =
+                        new ChildChangeListener(newValue as INotifyPropertyChanged, propertyName);
+                }
+                else
+                {
+                    Debug.WriteLine($"not listening to {propertyName} as {newValue} is {newValue.GetType()}");
                 }
 
-                var property = type.GetTypeInfo().GetDeclaredProperty(propertyName);
-                if (property == null)
-                    throw new InvalidOperationException(
-                        $"Was unable to get '{propertyName}' property information from Type '{type.Name}'");
-
-                object newValue = property.GetValue(value, null);
-
-                // Only recreate if there is a new value
-                if (newValue != null)
-                {
-                    if (newValue is INotifyCollectionChanged)
-                    {
-                        childListeners[propertyName] =
-                            new CollectionChangeListener(newValue as INotifyCollectionChanged, propertyName);
-                    }
-                    else if (newValue is INotifyPropertyChanged)
-                    {
-                        childListeners[propertyName] =
-                            new ChildChangeListener(newValue as INotifyPropertyChanged, propertyName);
-                    }
-
-                    if (childListeners[propertyName] != null)
-                        childListeners[propertyName].PropertyChanged += child_PropertyChanged;
-                }
+                if (listener != null)
+                    listener.PropertyChanged += child_PropertyChanged;
             }
         }
         #endregion
