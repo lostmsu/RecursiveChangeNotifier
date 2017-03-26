@@ -2,6 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.0</TargetFramework>
+    <Version>0.3</Version>
+    <Authors>Wonka, Victor Milovanov, Thomas Jaworski</Authors>
+    <Company />
+    <Description>Provides change notifications (INotifyPropertyChanged) for nested data structures (e.g. INotifyCollectionChanged&lt;INotifyPropertyChanged&gt;)</Description>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/lostmsu/RecursiveChangeNotifier/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/lostmsu/RecursiveChangeNotifier</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/lostmsu/RecursiveChangeNotifier.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <AssemblyVersion>0.3</AssemblyVersion>
+    <FileVersion>0.3</FileVersion>
+    <PackageTags>INotifyPropertyChanged, INotifyCollectionChanged, data binding</PackageTags>
   </PropertyGroup>
 
 </Project>
