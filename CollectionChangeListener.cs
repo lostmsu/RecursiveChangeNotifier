@@ -6,6 +6,7 @@ namespace ThomasJaworski.ComponentModel
     using System.Collections.Specialized;
     using System.ComponentModel;
     using System.Diagnostics;
+    using System.Linq;
 
     public class CollectionChangeListener : ChangeListener
     {
@@ -31,7 +32,7 @@ namespace ThomasJaworski.ComponentModel
         {
             value.CollectionChanged += value_CollectionChanged;
 
-            foreach (INotifyPropertyChanged item in (IEnumerable)value)
+            foreach (var item in ((IEnumerable)value).OfType<INotifyPropertyChanged>())
             {
                 ResetChildListener(item);
             }
@@ -91,14 +92,14 @@ namespace ThomasJaworski.ComponentModel
                 // Don't care about e.Action, if there are old items, Remove them...
                 if (e.OldItems != null)
                 {
-                    foreach (INotifyPropertyChanged item in e.OldItems)
+                    foreach (var item in e.OldItems.OfType<INotifyPropertyChanged>())
                         RemoveItem(item);
                 }
 
                 // ...add new items as well
                 if (e.NewItems != null)
                 {
-                    foreach (INotifyPropertyChanged item in e.NewItems)
+                    foreach (var item in e.NewItems.OfType<INotifyPropertyChanged>())
                         ResetChildListener(item);
                 }
             }
