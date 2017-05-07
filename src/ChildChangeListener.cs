@@ -77,7 +77,7 @@ namespace ThomasJaworski.ComponentModel
                 childListeners.Remove(propertyName);
             }
 
-            var property = type.GetTypeInfo().GetDeclaredProperty(propertyName);
+            PropertyInfo property = this.type.GetProperty(propertyName);
             if (property == null)
                 throw new InvalidOperationException(
                     $"Was unable to get '{propertyName}' property information from Type '{type.Name}'");
