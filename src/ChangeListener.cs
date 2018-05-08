@@ -4,7 +4,7 @@ namespace ThomasJaworski.ComponentModel
     using System.Collections.Specialized;
     using System.ComponentModel;
 
-    public abstract class ChangeListener : INotifyPropertyChanged, IDisposable
+    public abstract class ChangeListener : INotifyPropertyChanged, INotifyCollectionChanged, IDisposable
     {
         #region *** Members ***
         protected string PropertyName;
@@ -23,6 +23,12 @@ namespace ThomasJaworski.ComponentModel
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        protected virtual void RaiseCollectionChanged(
+            INotifyCollectionChanged collection, NotifyCollectionChangedEventArgs args) =>
+            this.CollectionChanged?.Invoke(collection, args);
         #endregion
 
 

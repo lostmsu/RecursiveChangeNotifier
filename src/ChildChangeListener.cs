@@ -102,8 +102,10 @@ namespace ThomasJaworski.ComponentModel
                     Debug.WriteLine($"not listening to {propertyName} as {newValue} is {newValue.GetType()}");
                 }
 
-                if (listener != null)
+                if (listener != null) {
                     listener.PropertyChanged += child_PropertyChanged;
+                    listener.CollectionChanged += child_CollectionChanged;
+                }
             }
         }
         #endregion
@@ -113,6 +115,10 @@ namespace ThomasJaworski.ComponentModel
         void child_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             RaisePropertyChanged(propertyName: e.PropertyName);
+        }
+
+        void child_CollectionChanged(object sender, NotifyCollectionChangedEventArgs args) {
+            this.RaiseCollectionChanged((INotifyCollectionChanged)sender, args);
         }
 
         void value_PropertyChanged(object sender, PropertyChangedEventArgs e)

@@ -52,6 +52,7 @@ namespace ThomasJaworski.ComponentModel
                 : new ChildChangeListener(item);
 
             listener.PropertyChanged += listener_PropertyChanged;
+            listener.CollectionChanged += listener_CollectionChanged;
             collectionListeners.Add(item, listener);
         }
 
@@ -61,6 +62,7 @@ namespace ThomasJaworski.ComponentModel
             if (collectionListeners.ContainsKey(item))
             {
                 collectionListeners[item].PropertyChanged -= listener_PropertyChanged;
+                collectionListeners[item].CollectionChanged -= listener_CollectionChanged;
 
                 collectionListeners[item].Dispose();
                 collectionListeners.Remove(item);
@@ -103,6 +105,9 @@ namespace ThomasJaworski.ComponentModel
                         ResetChildListener(item);
                 }
             }
+
+            Debug.Assert(sender == this.value);
+            this.RaiseCollectionChanged(this.value, e);;
         }
 
 
@@ -111,6 +116,10 @@ namespace ThomasJaworski.ComponentModel
             // ...then, notify about it
             // ReSharper disable once ExplicitCallerInfoArgument
             RaisePropertyChanged($"{PropertyName}{(PropertyName != null ? "[]." : null)}{e.PropertyName}");
+        }
+        void listener_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            this.RaiseCollectionChanged((INotifyCollectionChanged)sender, e);
         }
         #endregion
 

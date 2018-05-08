@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.0</TargetFramework>
-    <VersionPrefix>0.3</VersionPrefix>
+    <VersionPrefix>0.4</VersionPrefix>
     <Authors>Wonka, Victor Milovanov, Thomas Jaworski</Authors>
     <Company />
     <Description>Provides change notifications (INotifyPropertyChanged) for nested data structures (e.g. INotifyCollectionChanged&lt;INotifyPropertyChanged&gt;)</Description>
