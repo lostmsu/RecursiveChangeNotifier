@@ -134,7 +134,7 @@ namespace ThomasJaworski.ComponentModel
 
             value.CollectionChanged -= value_CollectionChanged;
 
-            Debug.WriteLine("CollectionChangeListener unsubscribed");
+            Debug.WriteLineIf(DebugTracing, "CollectionChangeListener unsubscribed");
         }
         #endregion
     }

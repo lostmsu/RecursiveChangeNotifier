@@ -23,7 +23,7 @@ namespace ThomasJaworski.ComponentModel
             if (instance == null)
                 throw new ArgumentNullException(nameof(instance));
 
-            Debug.WriteLine($"creating {nameof(ChildChangeListener)} for {instance}");
+            Debug.WriteLineIf(DebugTracing, $"creating {nameof(ChildChangeListener)} for {instance}");
 
             value = instance;
             type = value.GetType();
@@ -99,7 +99,7 @@ namespace ThomasJaworski.ComponentModel
                 }
                 else
                 {
-                    Debug.WriteLine($"not listening to {propertyName} as {newValue} is {newValue.GetType()}");
+                    Debug.WriteLineIf(DebugTracing, $"not listening to {propertyName} as {newValue} is {newValue.GetType()}");
                 }
 
                 if (listener != null) {
@@ -154,7 +154,7 @@ namespace ThomasJaworski.ComponentModel
 
             childListeners.Clear();
 
-            Debug.WriteLine("ChildChangeListener '{0}' unsubscribed", PropertyName);
+            Debug.WriteLineIf(DebugTracing, $"ChildChangeListener '{PropertyName}' unsubscribed");
         }
         #endregion
     }

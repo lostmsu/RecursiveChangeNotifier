@@ -72,5 +72,13 @@ namespace ThomasJaworski.ComponentModel
             return value != null ? new ChildChangeListener(value, propertyName) : null;
         }
         #endregion
+
+        #region Debugging
+        static volatile bool debugTracing = false;
+        public static bool DebugTracing {
+            get => debugTracing;
+            set => debugTracing = value;
+        }
+        #endregion
     }
 }
