@@ -24,7 +24,18 @@ namespace Tests
 
         class SimpleClassWithObservableCollection: NotifyPropertyChangedBase
         {
+            int @int;
             public ObservableCollection<string> Strings { get; } = new ObservableCollection<string>();
+            public int Int {
+                get => this.@int;
+                set {
+                    if (value == this.@int)
+                        return;
+
+                    this.@int = value;
+                    this.OnPropertyChanged();
+                }
+            }
         }
 
         class DeeperObservableCollection : NotifyPropertyChangedBase
@@ -33,7 +44,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void ObserbableCollections()
+        public void ObservableCollections()
         {
             var collectionContainer = new SimpleClassWithObservableCollection();
             using (var changeNotifier = ChangeListener.Create(collectionContainer)) {
@@ -81,6 +92,9 @@ namespace Tests
                 Assert.AreEqual(2, collectionChanges);
 
                 Assert.IsNull(detectedProperty);
+
+                nested.Int = 42;
+                Assert.AreEqual($"{nameof(DeeperObservableCollection.Nested)}[].{nameof(SimpleClassWithObservableCollection.Int)}", detectedProperty);
             }
         }
     }
