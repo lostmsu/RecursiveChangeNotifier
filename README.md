@@ -4,4 +4,6 @@
 var listener = ChangeListener.Create(myViewModel);
 listener.PropertyChanged += 
     new PropertyChangedEventHandler(listener_PropertyChanged);
+listener.CollectionChanged +=
+    new NotifyCollectionChangedEventHandler(listener_CollectionChanged);
 ```
