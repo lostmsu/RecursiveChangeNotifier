@@ -6,12 +6,20 @@
     <Authors>Wonka, Victor Milovanov, Thomas Jaworski</Authors>
     <Company />
     <Description>Provides change notifications (INotifyPropertyChanged) for nested data structures (e.g. INotifyCollectionChanged&lt;INotifyPropertyChanged&gt;)</Description>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/lostmsu/RecursiveChangeNotifier/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/lostmsu/RecursiveChangeNotifier</PackageProjectUrl>
     <RepositoryUrl>https://github.com/lostmsu/RecursiveChangeNotifier.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>INotifyPropertyChanged, INotifyCollectionChanged, data binding</PackageTags>
     <RootNamespace>ThomasJaworski.ComponentModel</RootNamespace>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
