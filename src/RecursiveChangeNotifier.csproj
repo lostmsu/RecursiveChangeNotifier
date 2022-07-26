@@ -2,8 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.0</TargetFramework>
-    <VersionPrefix>0.4</VersionPrefix>
-    <Authors>Wonka, Victor Milovanov, Thomas Jaworski</Authors>
+    <LangVersion>10.0</LangVersion>
+
+    <VersionPrefix>0.5</VersionPrefix>
+    <Authors>Wonka, Victor Nova, Thomas Jaworski</Authors>
     <Company />
     <Description>Provides change notifications (INotifyPropertyChanged) for nested data structures (e.g. INotifyCollectionChanged&lt;INotifyPropertyChanged&gt;)</Description>
     <PackageLicenseUrl></PackageLicenseUrl>
@@ -13,6 +15,12 @@
     <PackageTags>INotifyPropertyChanged, INotifyCollectionChanged, data binding</PackageTags>
     <RootNamespace>ThomasJaworski.ComponentModel</RootNamespace>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+
+    <!-- The following is recommended for public projects -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <DebugSymbols>true</DebugSymbols>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +28,11 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The following is recommended for public projects -->
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>
