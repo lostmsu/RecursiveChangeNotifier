@@ -111,11 +111,12 @@ namespace ThomasJaworski.ComponentModel
         }
 
 
-        void listener_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        void listener_PropertyChanged(object sender, NestedPropertyChangedEventArgs e)
         {
             // ...then, notify about it
             // ReSharper disable once ExplicitCallerInfoArgument
-            RaisePropertyChanged($"{PropertyName}{(PropertyName != null ? "[]." : null)}{e.PropertyName}");
+            RaisePropertyChanged(fullPath: $"{PropertyName}{(PropertyName != null ? "[]." : null)}{e.FullPath}",
+                                 e.Object, e.PropertyName);
         }
         void listener_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {

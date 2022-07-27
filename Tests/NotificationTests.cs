@@ -38,6 +38,21 @@ namespace Tests
             }
         }
 
+        class NestedClass : NotifyPropertyChangedBase {
+            SimpleClassWithObservableCollection nested;
+            
+            public SimpleClassWithObservableCollection Nested {
+                get => this.nested;
+                set {
+                    if (value == this.nested)
+                        return;
+
+                    this.nested = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
         class DeeperObservableCollection : NotifyPropertyChangedBase
         {
             public ObservableCollection<SimpleClassWithObservableCollection> Nested { get; } = new ObservableCollection<SimpleClassWithObservableCollection>();
@@ -49,15 +64,20 @@ namespace Tests
             var collectionContainer = new SimpleClassWithObservableCollection();
             using (var changeNotifier = ChangeListener.Create(collectionContainer)) {
                 string detectedProperty = null;
+                string detectedPath = null;
                 INotifyCollectionChanged detectedCollection = null;
                 string[] detectedNewItems = null;
-                changeNotifier.PropertyChanged += (sender, args) => detectedProperty = args.PropertyName;
+                changeNotifier.PropertyChanged += (sender, args) => {
+                    detectedProperty = args.PropertyName;
+                    detectedPath = args.FullPath;
+                };
                 changeNotifier.CollectionChanged += (collection, args) => {
                     detectedCollection = (INotifyCollectionChanged)collection;
                     detectedNewItems = args.NewItems.Cast<string>().ToArray();
                 };
                 collectionContainer.Strings.Add("A string");
                 Assert.IsNull(detectedProperty);
+                Assert.IsNull(detectedPath);
                 Assert.AreSame(collectionContainer.Strings, detectedCollection);
                 CollectionAssert.AreEquivalent(collectionContainer.Strings, detectedNewItems);
             }
@@ -69,9 +89,13 @@ namespace Tests
             var outer = new DeeperObservableCollection();
             using (var changeNotifier = ChangeListener.Create(outer)) {
                 string detectedProperty = null;
+                string detectedPath = null;
                 INotifyCollectionChanged detectedCollection = null;
                 IList detectedNewItems = null;
-                changeNotifier.PropertyChanged += (sender, args) => detectedProperty = args.PropertyName;
+                changeNotifier.PropertyChanged += (sender, args) => {
+                    detectedProperty = args.PropertyName;
+                    detectedPath = args.FullPath;
+                };
                 int collectionChanges = 0;
                 changeNotifier.CollectionChanged += (collection, args) => {
                     detectedCollection = (INotifyCollectionChanged)collection;
@@ -94,8 +118,28 @@ namespace Tests
                 Assert.IsNull(detectedProperty);
 
                 nested.Int = 42;
-                Assert.AreEqual($"{nameof(DeeperObservableCollection.Nested)}[].{nameof(SimpleClassWithObservableCollection.Int)}", detectedProperty);
+                Assert.AreEqual($"{nameof(DeeperObservableCollection.Nested)}[].{nameof(SimpleClassWithObservableCollection.Int)}", detectedPath);
+                Assert.AreEqual(nameof(SimpleClassWithObservableCollection.Int), detectedProperty);
             }
+        }
+
+        [TestMethod]
+        public void NestedObject() {
+            var root = new NestedClass {
+                Nested = new(),
+            };
+            using var changeNotifier = ChangeListener.Create(root);
+            NestedPropertyChangedEventArgs detected = null;
+            changeNotifier.PropertyChanged += (sender, args) => {
+                detected = args;
+            };
+
+            root.Nested.Int = 42;
+
+            Assert.IsNotNull(detected);
+            Assert.AreEqual($"{nameof(NestedClass.Nested)}.{nameof(SimpleClassWithObservableCollection.Int)}", detected.FullPath);
+            Assert.AreEqual(nameof(SimpleClassWithObservableCollection.Int), detected.PropertyName);
+            Assert.AreSame(root.Nested, detected.Object);
         }
     }
 }

@@ -42,7 +42,10 @@ namespace ThomasJaworski.ComponentModel
         #region *** Private Methods ***
         private void Subscribe()
         {
-            value.PropertyChanged += value_PropertyChanged;
+            if (value is INotifyNestedPropertyChanged nested)
+                nested.PropertyChanged += value_NestedPropertyChanged;
+            else
+                value.PropertyChanged += value_PropertyChanged;
 
             foreach (var property in type.GetTypeInfo().DeclaredProperties)
             {
@@ -112,12 +115,13 @@ namespace ThomasJaworski.ComponentModel
 
 
         #region *** Event Handler ***
-        void child_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        void child_PropertyChanged(object sender, NestedPropertyChangedEventArgs e)
         {
-            RaisePropertyChanged(propertyName: e.PropertyName);
+            RaisePropertyChanged(fullPath: e.FullPath, e.Object, e.PropertyName);
         }
 
-        void child_CollectionChanged(object sender, NotifyCollectionChangedEventArgs args) {
+        void child_CollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
             this.RaiseCollectionChanged((INotifyCollectionChanged)sender, args);
         }
 
@@ -127,13 +131,22 @@ namespace ThomasJaworski.ComponentModel
             ResetChildListener(e.PropertyName);
 
             // ...then, notify about it
-            RaisePropertyChanged(propertyName: e.PropertyName);
+            RaisePropertyChanged(fullPath: e.PropertyName, value, propertyName: e.PropertyName);
         }
 
-        protected override void RaisePropertyChanged(string propertyName)
+        void value_NestedPropertyChanged(object sender, NestedPropertyChangedEventArgs e)
+        {
+            // First, reset child on change, if required...
+            ResetChildListener(e.PropertyName);
+
+            // ...then, notify about it
+            RaisePropertyChanged(fullPath: e.FullPath, e.Object, propertyName: e.PropertyName);
+        }
+
+        protected override void RaisePropertyChanged(string fullPath, object @object, string propertyName)
         {
             // Special Formatting
-            base.RaisePropertyChanged($"{PropertyName}{(PropertyName != null ? "." : null)}{propertyName}");
+            base.RaisePropertyChanged($"{PropertyName}{(PropertyName != null ? "." : null)}{fullPath}", @object, propertyName);
         }
         #endregion
 
@@ -144,7 +157,10 @@ namespace ThomasJaworski.ComponentModel
         /// </summary>
         protected override void Unsubscribe()
         {
-            value.PropertyChanged -= value_PropertyChanged;
+            if (value is INotifyNestedPropertyChanged nested)
+                nested.PropertyChanged -= value_NestedPropertyChanged;
+            else
+                value.PropertyChanged -= value_PropertyChanged;
 
             foreach (var binderKey in childListeners.Keys)
             {

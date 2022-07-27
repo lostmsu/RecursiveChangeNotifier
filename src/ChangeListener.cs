@@ -1,10 +1,13 @@
 namespace ThomasJaworski.ComponentModel
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.ComponentModel;
 
-    public abstract class ChangeListener : INotifyPropertyChanged, INotifyCollectionChanged, IDisposable
+    using ChangedHandler = PropertyChangedEventHandler<NestedPropertyChangedEventArgs>;
+
+    public abstract class ChangeListener : INotifyNestedPropertyChanged, INotifyPropertyChanged, INotifyCollectionChanged, IDisposable
     {
         #region *** Members ***
         protected string PropertyName;
@@ -17,11 +20,18 @@ namespace ThomasJaworski.ComponentModel
 
 
         #region *** INotifyPropertyChanged Members and Invoker ***
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event ChangedHandler PropertyChanged;
+        private event PropertyChangedEventHandler LegacyPropertyChanged;
+        event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged{
+            add => LegacyPropertyChanged += value;
+            remove => LegacyPropertyChanged -= value;
+        }
 
-        protected virtual void RaisePropertyChanged(string propertyName)
+        protected virtual void RaisePropertyChanged(string fullPath, object @object, string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            var args = new NestedPropertyChangedEventArgs(fullPath, @object, propertyName);
+            PropertyChanged?.Invoke(this, args);
+            LegacyPropertyChanged?.Invoke(this, args);
         }
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
