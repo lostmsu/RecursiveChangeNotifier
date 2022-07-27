@@ -5,16 +5,16 @@
     <LangVersion>10.0</LangVersion>
 
     <VersionPrefix>0.5</VersionPrefix>
-    <Authors>Wonka, Victor Nova, Thomas Jaworski</Authors>
+    <Authors>Victor Nova, Wonka, Thomas Jaworski</Authors>
     <Company />
     <Description>Provides change notifications (INotifyPropertyChanged) for nested data structures (e.g. INotifyCollectionChanged&lt;INotifyPropertyChanged&gt;)</Description>
-    <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/lostmsu/RecursiveChangeNotifier</PackageProjectUrl>
     <RepositoryUrl>https://github.com/lostmsu/RecursiveChangeNotifier.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>INotifyPropertyChanged, INotifyCollectionChanged, data binding</PackageTags>
     <RootNamespace>ThomasJaworski.ComponentModel</RootNamespace>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <!-- The following is recommended for public projects -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -24,10 +24,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\LICENSE.txt">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
+    <None Include="..\LICENSE.txt" Pack="True" PackagePath=""/>
+    <None Include="..\README.md" Pack="True" PackagePath=""/>
   </ItemGroup>
 
   <ItemGroup>
