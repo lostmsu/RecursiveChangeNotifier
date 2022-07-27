@@ -3,7 +3,7 @@
 ```csharp
 var listener = ChangeListener.Create(myViewModel);
 listener.PropertyChanged += 
-    new PropertyChangedEventHandler(listener_PropertyChanged);
+    new PropertyChangedEventHandler<NestedPropertyChangedEventArgs>(listener_PropertyChanged);
 listener.CollectionChanged +=
     new NotifyCollectionChangedEventHandler(listener_CollectionChanged);
 ```
